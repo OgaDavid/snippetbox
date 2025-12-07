@@ -1,25 +1,40 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
-func home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+func home(res http.ResponseWriter, req *http.Request) {
+	if req.URL.Path != "/" {
+		http.NotFound(res, req)
 		return
 	}
 
-	w.Write([]byte("Hello from SnippetBox"))
+	res.Write([]byte("Hello from SnippetBox"))
 }
 
-func showSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Fetching a specific snippet"))
+func showSnippet(res http.ResponseWriter, req *http.Request) {
+	id, err := strconv.Atoi(req.URL.Query().Get("id"))
+
+	if err != nil || id < 1 {
+		http.NotFound(res, req)
+		return
+	}
+
+	fmt.Fprintf(res, "Display a specific snippet with ID: %d", id)
 }
 
-func createSnippet(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Create a snippet"))
+func createSnippet(res http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" {
+		res.Header().Set("Allow", "POST")
+		res.Header().Set("Content-Type", "application/json")
+		http.Error(res, "Method not allowed!", http.StatusMethodNotAllowed)
+		return
+	}
+	res.Write([]byte("Create a snippet"))
 }
 
 func main() {
