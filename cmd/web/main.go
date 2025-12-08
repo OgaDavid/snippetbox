@@ -12,9 +12,8 @@ func main() {
 	mux.HandleFunc("/snippet", showSnippet)
 	mux.HandleFunc("/create", createSnippet)
 
+	log.Println("🛡️ Server running on :4000🛡️")
 	err := http.ListenAndServe(":4000", mux)
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(err)
 }
